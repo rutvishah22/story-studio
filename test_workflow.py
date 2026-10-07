@@ -30,7 +30,9 @@ class Workflow(unittest.TestCase):
         p=fixture()
         for f in p['facts']:
             if f['category']=='solution': f['status']='uncertain'
-        with self.assertRaises(ValueError):s.plan(p)
+        focus=s.plan(p)
+        self.assertIn('solution',focus['evidence_gaps'])
+        self.assertTrue(focus['selected'])
     def test_http_edit_and_upload(self):
         def post(action,p=None,**kw):
             req=urllib.request.Request('http://127.0.0.1:8768/api/'+action,data=json.dumps({'project':p,**kw}).encode(),headers={'Content-Type':'application/json'})

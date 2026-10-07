@@ -8,9 +8,13 @@ Requires Python 3.10+. Run `python -m pip install -r requirements.txt`, copy `.e
 
 The frontend keeps state in browser session storage. Refresh restores the tab's work; use a new tab/private window for an independent session. Server-side projects and uploads are not persisted in session mode. Copy/download draft text before closing the tab. API credentials stay on the server.
 
-## Fact review
+## Intake summary and optional review
 
-The default view shows a four-part story summary, results under an expandable panel, and the number of restrictions excluded. Individual fact cards appear only for missing information, ambiguous metrics, contradictions flagged by extraction, or manual-source verification. All evidence and restrictions remain available under “View all facts.” One explicit summary confirmation confirms the clear permitted facts; unresolved exceptions stay excluded.
+After reading an intake, the app shows what it understood: client context, the problem, what changed and the result. Click **Continue with intake** to accept clear, source-backed facts; there is no mandatory checkbox or requirement to fix a category label. Individual review is optional and the writer can return later.
+
+Flagged facts are collapsed under an optional review panel. Ambiguous metrics, unverified interpretations and restrictions remain excluded until resolved. Missing story classifications are advisory, not evidence that the document lacks the information. Extraction recognises alternate wording and measured results can fulfil the outcome role without duplicating a metric as another fact. Baseline and projected figures do not count as achieved results.
+
+Even if no usable facts remain, the writer can open an editable draft with visible evidence-pending placeholders, save it and add evidence later. These placeholders are not real factual content and cannot pass final approval. Unresolved claims and unavailable validation still prevent approval; continuing is not automatic verification or human approval. The acceptance record distinguishes clicking Continue from individual fact confirmation.
 
 ## Deploy to Vercel
 
@@ -31,3 +35,9 @@ The applied writing brief preserves the observed section purposes, narrative seq
 Read story presents the complete narrative. Edit sections exposes source links, section rewriting and revision controls. A rewrite requests only that section with the surrounding draft as context. Edits and rewrites invalidate prior validation. Deterministic metric checks permit natural prose but preserve each linked metric's value, unit, period, qualifier and comparison. Missing evidence links and unsupported verbal fractions block validation. Writing checks flag repeated sentences and compressed sections; model-assisted review checks nonnumeric claims and business writing quality. Fictional material always remains sample-only, including after automated checks pass.
 
 Run the regression suite: `python -m unittest test_session test_resilience test_writing test_workflow.Workflow.test_both_formats_and_integrity test_workflow.Workflow.test_references_and_exclusions test_workflow.Workflow.test_missing_story -v`. These tests do not spend inference quota. Live model tests use fictional data only. Free-provider rate limits or outages may require retrying; a writing-quality test is not a guarantee that every intake will produce an approved draft.
+
+## Optional-review regression checks
+
+Run `python -m unittest test_transparent_review test_session test_resilience test_writing test_workflow.Workflow.test_both_formats_and_integrity test_workflow.Workflow.test_references_and_exclusions test_workflow.Workflow.test_missing_story -v`.
+
+Checks include continuation with flagged facts/missing labels, incomplete metric exclusion, semantic category aliases, metric outcome vs baseline/target distinction, source-only fallback, offline partial sample continuation, placeholder editing in both formats and unchanged approval safeguards. No inference quota is consumed by these automated tests. Browser checks use the fictional sample; deployed inference depends on the configured provider.
