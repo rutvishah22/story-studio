@@ -1,0 +1,27 @@
+# Applied writing brief
+
+Use the confirmed intake as factual evidence. This brief contains structure and style only, distilled from the five supplied examples. It supplies no company, product, client or metric facts.
+
+Voice: business-oriented, measured, confident, simple, crisp and direct. Write for a business decision-maker evaluating a similar operational problem. Explain the working process and its business relevance before technical architecture. Do not invent an audience, ICP, business value or role absent from the intake. Use consistent British English and third-person narration. Use active verbs, named actors and natural medium-length sentences. Avoid choppy fragments, hype, generic promotional phrases, excessive jargon, and repeated summary sentences. Each paragraph develops one idea through two or three connected sentences where evidence allows.
+
+Narrative: operational situation → previous process and constraint → changed workflow → user action/control → supported result → evidenced business meaning. Explain technical capabilities through what people actually do. Describe input → processing/change → output → human use/review, but include only mechanisms supported by this intake. Never assume review, automation, integration, transparency or continuing improvement merely because they occurred in other stories.
+
+Case Study internal order:
+1. Title: normally 12–20 words; a strong supported outcome-led headline, often starting with How. Prefer a nonnumeric headline so metric qualifiers do not make it cumbersome. Do not copy an outcome fact sentence as the headline.
+2. Subtext: around 25–45 words in one or two sentences; explain the intervention and principal supported change. Do not repeat the client biography from Context.
+3. Context: around 40–70 words; client activity, permitted sector/scope and the operational situation. A short transformation summary can orient the reader without repeating Subtext.
+4. Key Metrics: normally two or three compact bullets if available; one verified metric is sufficient. Use confirmed results; put baseline conditions in Challenge or clearly label them. Do not invent additional metrics to fill the block.
+5. The Challenge: normally 70–120 words in two or three paragraphs. Develop the previous workflow, manual steps, dependencies and constraints, then the supported consequence. Use concrete operating detail rather than a generic problem statement.
+6. The Solution: normally 120–180 words in three or four paragraphs, usually the longest section. Introduce the intervention, walk through the changed process in sequence and explain how users act on its output. Explain oversight only when evidenced. Finish with the supported change to people's work; avoid a disconnected feature list.
+7. The Outcome: normally 60–100 words in two paragraphs or a compact results list with explanation. Report the results and their supported operational meaning. Do not repeat the Solution or invent strategic implications. Distinguish realised outcomes from estimates, opportunity value and capacity equivalents.
+8. CTA: use approved messaging only. Until supplied, retain [Approved CTA pending] without inventing product promises or an invitation.
+
+The supplied examples contain approximately 380–617 words, most around 380–427. Aim for around 380–550 with a sufficiently detailed intake; the ranges above are flexible, not quotas. Never pad sparse evidence. A short draft should expose its evidence limitation during review rather than invent a story.
+
+Presentation: developed paragraphs separated by blank lines, compact metrics bullets, restrained emphasis. Title, Context, Key Metrics and CTA need not have visible reader labels. Challenge, Solution and Outcome have clear headings. No obligatory quote, testimonial, image or chart. Opening metrics may recur in Outcome only when they serve a distinct purpose.
+
+Metric rules: preserve exact value, unit, period, qualifier and baseline/comparison each time a metric occurs. Natural paraphrasing is welcome; copying full source sentences is unnecessary. Do not round, infer ratios, convert recovered capacity into headcount reduction, turn opportunity into revenue, or imply savings not confirmed by the intake. Keep headline nonnumeric and numerical details in results sections. Use all supporting fact IDs in the section metadata; no fact IDs or editorial commentary in reader-facing prose.
+
+One-Pager: provisional order is Headline; Client and Context; Challenge; Solution; Impact or Key Results; Why It Matters; CTA. Apply the same voice and confirmed approved plan, not the Case Study's lengths or extra sections. Aim for around 220–320 words where evidence supports it. Compress the narrative into concise developed paragraphs: audience/context, concrete constraint, changed workflow, supported results, practical relevance. Why It Matters must remain evidence-backed. Keep CTA provisional. These five examples establish no approved One-Pager template.
+
+Each section has a distinct purpose. Avoid repeating the same facts with the same phrasing across Subtext, Context and Outcome. Selective result repetition must add useful interpretation. All factual claims come from confirmed permitted current-intake facts selected by the approved plan. Approved active references of the chosen format may guide style only. If none are available, apply this brief. Exclude restricted facts and reference identities, metrics and distinctive phrases.

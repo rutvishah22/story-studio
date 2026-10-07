@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "web",
+  "functions": {"api/index.py": {"maxDuration": 120, "includeFiles": "{server.py,editorial-profile.md,writing-brief.md,sample_narrative.py}"}},
+  "rewrites": [{"source": "/api/:action", "destination": "/api/index?action=:action"}],
+  "headers": [{"source": "/api/(.*)", "headers": [{"key": "Cache-Control", "value": "no-store"}]}]
+}

@@ -1,0 +1,8 @@
+.env
+.env.*
+data/
+__pycache__/
+work/
+test_*.py
+check_connection.py
+*.ps1
