@@ -85,7 +85,9 @@ def map_intake(document):
             if timeframe:period=timeframe[0]
             elif unit=='×':period='not applicable'
             qualifier='estimated' if re.search(r'estimat',wording,re.I) else 'approximately' if re.search(r'approxim|~',wording) else ''
-            comparison=wording.split('After:')[0].replace('Before:','').strip() if 'After:' in wording else ''
+            baseline=wording.split('After:')[0].replace('Before:','').strip() if 'After:' in wording else ''
+            baseline_number=re.search(r'[\d,]+(?:\.\d+)?\s*(?:hours?|hrs?|minutes?|mins?|cycles?|users?)\s*(?:/(?:week|month|year|day)|per (?:week|month|year|day))?',baseline,re.I)
+            comparison=baseline_number[0] if baseline_number else ''
             # Several values in a before/after result are normal, not an ambiguity.
             conflict=re.search(r'([\d,]+)\s+search hours/month.*?\(([\d,]+)\s*[×x]\s*([\d,]+)\s*hrs/week\s*[×x]\s*([\d,]+)\s*weeks',wording,re.I)
             if conflict:
@@ -95,5 +97,5 @@ def map_intake(document):
             if not unit:review.append('Metric unit needs confirmation.')
             if re.search(r'target|potential|projected|estimated|assuming|equivalent|capacity',wording,re.I):review.append('Confirm whether this is measured, estimated or projected; capacity is not automatically realised savings.')
         if a['group'] in ['before_state','solution'] and re.search(r'\b(target|projected|assuming|potential savings)\b',wording,re.I):review.append('This answer includes a target or calculated estimate. Confirm its publication basis before using the whole claim.')
-        facts.append({'calculation_conflict':any(reason.startswith('Conflicting calculation:') for reason in review),'category':cat,'wording':wording,'passage':a['source'],'location':'; '.join(dict.fromkeys(a['locations'])),'intake_group':a['group'],'field':a['field'],'value':value,'unit':unit,'period':period,'qualifier':qualifier,'comparison':comparison,'needs_review':bool(review),'review_reason':' '.join(review),'metric_role':('unknown' if review else 'result') if cat=='metric' else 'not_applicable','story_roles':[category[a['group']]] if cat!='metric' else ['outcome'],'restriction':wording if cat=='restricted' else ''})
+        facts.append({'calculation_conflict':any(reason.startswith('Conflicting calculation:') for reason in review),'baseline_description':wording.split('After:')[0].replace('Before:','').strip() if 'After:' in wording else '', 'category':cat,'wording':wording,'passage':a['source'],'location':'; '.join(dict.fromkeys(a['locations'])),'intake_group':a['group'],'field':a['field'],'value':value,'unit':unit,'period':period,'qualifier':qualifier,'comparison':comparison,'needs_review':bool(review),'review_reason':' '.join(review),'metric_role':('unknown' if review else 'result') if cat=='metric' else 'not_applicable','story_roles':[category[a['group']]] if cat!='metric' else ['outcome'],'restriction':wording if cat=='restricted' else ''})
     return {'facts':facts,'answers':answers,'unmapped_fields':unmapped,'engine':'Local section-and-answer mapping'}

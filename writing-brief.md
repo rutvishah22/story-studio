@@ -31,7 +31,7 @@ The Solution: normally the longest section, 3–5 compact paragraphs where evide
 
 The Outcome: select the effects not already explained, then state the evidenced operating capability the client gained. Compact result bullets followed by a short paragraph are appropriate. Do not repeat the entire opening scorecard. Do not restate features. Do not invent staff redeployment, higher-value work, customer engagement, revenue causality, competitive advantage or scale. Capacity equivalents are not jobs removed, and opportunities are not realised revenue. A modest supported conclusion is stronger than unsupported strategic language.
 
-CTA: retain [Approved CTA pending] until approved messaging is supplied. The sample CTAs are style references, not automatic approval for new drafts.
+CTA: use the approved pain-point invitation template supplied by the app. For Product Genius, ask about manual product searches, connect the invitation to evidence-backed recommendations, and close with a short action line. Other workflows use the neutral approved invitation. Do not add numeric promises, guarantees or new product capabilities.
 
 ## Grounding and presentation
 Aim around 380–550 words for a rich Case Study, without padding; the examples vary. Paragraphs are separated by actual blank lines. Use ordinary bullets for metrics and plain text for prose. No source IDs or editorial notes in the reader-facing draft: fact_ids belong in section metadata. Every factual section, including headline/subtext, needs supporting IDs for every material claim. Keep human approval separate from automated checks.
@@ -40,3 +40,11 @@ Exact metric value, unit, qualifier, measurement period and comparison must be r
 
 ## One-Pager (provisional)
 Order: Headline; Client and Context; Challenge; Solution; Impact or Key Results; Why It Matters; CTA. Same confirmed facts, approved output-neutral plan and publication rules. Aim 220–320 words with sufficiently rich evidence. Select the same business tension and outcome; write a compact independent narrative rather than truncate the Case Study or copy every section. Use developed economical paragraphs, selective metrics and grounded practical relevance. Why It Matters adds supported meaning rather than repeats the Impact bullets. The five examples do not establish an approved One-Pager template.
+
+
+## Mandatory opening and readability pattern
+Title → Subtext → Context → Key Metrics → Challenge → Solution → Outcome → pain-point CTA. Context is not a company biography: anonymous client and relevant demand, the operating problem in 1–2 sentences, then a separate short "We..." change paragraph. Metrics follow immediately as a selective scorecard. Do not give every section a list of intake facts.
+
+The Solution starts by establishing the partnership and naming the evidenced service, then follows how it helps the user complete the work. Use short, connected paragraphs with one idea each. Do not bury decisions in long technical sentences. No obligatory deployment timeline or list of integrations. Outcome adds distinct results and closes with a modest supported operating capability. Avoid reusing the full opening scorecard.
+
+Quantity fields have identities: employee range, catalogue size, monthly requests, adoption, time, money and capacity must never substitute for each other. Preserve metric scope and exact values. A before-state description belongs in narrative context, not pasted after every bullet. Baseline/comparison metadata is concise; the full original description remains available as source evidence.

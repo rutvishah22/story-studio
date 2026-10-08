@@ -67,3 +67,11 @@ Run `python -m unittest test_story_policy test_intake_mapping test_document_read
 The drafting guide now follows the supplied examples' editorial choices: one business tension, selective context, a changed user workflow, partnership voice and distinct supported outcomes. It does not embed the original PDF or its claims. Numeric headlines are allowed when exact and supported, with full period/comparison retained in another section linked to the same metric. Editing a headline still triggers metric and anonymity checks. Lightweight narrative warnings flag repeated substantial sentences, impersonal delivery-team voice, generic selling and architecture-heavy Solution sections. One bounded refinement may repair these issues; this adds no mandatory extra model call. Style checks are advisory, while unsupported claims remain blockers.
 
 Run `python -m unittest test_narrative_quality test_writing test_story_policy test_intake_mapping test_document_reading test_transparent_review test_session test_resilience -v`.
+
+
+### Case-study opening and reader presentation
+The opening now explicitly follows headline, subtext, anonymous client/problem, a separate intervention bridge and selective metrics. Solution establishes the partnership before following the user workflow; Outcome adds distinct value. Evidence includes original field labels and metric scope. Employee-to-SKU substitution is a blocking scope check. Before descriptions remain in provenance while numeric baseline metadata is concise; common hours/period spellings are normalised without changing values.
+
+The approved Product Genius pain-point invitation replaces the provisional CTA for permitted Product Genius evidence. Other services use a neutral invitation without additional product promises. Fictional offline samples retain their sample CTA. No original reference PDF or sample claims are bundled. Reader text uses restrained typography, compact lists and expandable source/edit controls.
+
+Run `python -m unittest test_case_structure test_narrative_quality test_writing test_story_policy test_intake_mapping test_document_reading test_transparent_review test_session test_resilience -v`. Live model quality is not established by mocked regression; live testing remains skipped at the user's request.
