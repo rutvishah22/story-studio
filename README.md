@@ -41,3 +41,11 @@ Run the regression suite: `python -m unittest test_session test_resilience test_
 Run `python -m unittest test_transparent_review test_session test_resilience test_writing test_workflow.Workflow.test_both_formats_and_integrity test_workflow.Workflow.test_references_and_exclusions test_workflow.Workflow.test_missing_story -v`.
 
 Checks include continuation with flagged facts/missing labels, incomplete metric exclusion, semantic category aliases, metric outcome vs baseline/target distinction, source-only fallback, offline partial sample continuation, placeholder editing in both formats and unchanged approval safeguards. No inference quota is consumed by these automated tests. Browser checks use the fictional sample; deployed inference depends on the configured provider.
+
+
+### Structured intake reading
+PDFs use pdfplumber to preserve table rows, cells and reading order; Word files retain paragraphs and table question/answer relationships. Groq receives structured source blocks and extracts complete answers into six intake groups, retaining exact passages and metric details. Word fragments and unmatched claims are discarded. Failed AI extraction retains the readable source and offers Retry extraction; it never substitutes raw lines for facts. Supporting-evidence checkboxes have been removed from the normal story-focus flow.
+
+This uses free open-source libraries and the configured inference provider. No Docling service or paid OCR is required. Scanned/image-only PDFs are explicitly rejected because OCR is not implemented. Groq free-tier quotas and latency still apply. The original file is processed temporarily; only structured text and session state are returned, avoiding a base64 file in every later request. Retry uses the already-read document.
+
+Run the regression tests with `python -m unittest test_document_reading test_transparent_review test_session test_resilience test_writing -v`. Real provider writing quality must also be assessed using a completed, permitted intake; mocked tests cannot establish that quality.

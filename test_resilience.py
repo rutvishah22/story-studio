@@ -14,10 +14,10 @@ class Resilience(unittest.TestCase):
             finally:http.shutdown();http.server_close()
     def test_unmatched_provenance_falls_back(self):
         p=self.upload({'facts':[{'category':'challenge','wording':'Invented details','passage':'Unmatched invented passage'}]})
-        self.assertIn('Original source passages',p['extraction_note']);self.assertNotIn('Invented',p['facts'][0]['wording']);self.assertEqual(p['facts'][0]['status'],'uncertain')
+        self.assertEqual(p['facts'],[]);self.assertEqual(p['extraction_status'],'failed');self.assertTrue(p['document']['blocks']);self.assertIn('extraction failure',p['extraction_note'])
     def test_provider_failure_retains_source(self):
         p=self.upload(ValueError('Provider busy'))
-        self.assertTrue(p['facts']);self.assertIn('Provider busy',p['extraction_note']);self.assertTrue(p['file'])
+        self.assertEqual(p['facts'],[]);self.assertTrue(p['raw']);self.assertIn('Provider busy',p['extraction_note']);self.assertTrue(p['file'])
     def test_verified_passage_and_profile(self):
         p=self.upload({'facts':[{'category':'challenge','wording':'Dispatchers reconciled records manually.','passage':'Dispatchers  reconciled records manually'}]})
         self.assertEqual(p['facts'][0]['passage'],'Dispatchers reconciled records manually');self.assertEqual(p['facts'][0]['status'],'uncertain');self.assertIn('British English',s.PROFILE)
