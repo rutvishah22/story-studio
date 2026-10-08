@@ -12,7 +12,7 @@ class Writing(unittest.TestCase):
         with patch.dict(s.os.environ,{'OPENAI_API_KEY':'placeholder'}),patch.object(s,'ai',return_value={'sections':copy.deepcopy(SAMPLE_DRAFTS['Case Study'])}) as model:
             d=s.draft(p,'Case Study');self.assertEqual(d['engine'],'AI-written fictional sample')
             prompt=model.call_args.args[0]
-            for rule in ['business decision-maker','The Solution','medium-length','British English','380','paraphras','fact_ids']:
+            for rule in ['Fortune 500 C-suite','The Solution','medium-length','British English','380','select evidence','fact_ids']:
                 self.assertIn(rule.casefold(),prompt.casefold())
             self.assertNotIn('Violet Lantern',prompt)
             self.assertGreater(sum(len(x['text'].split()) for x in d['sections']),350)
