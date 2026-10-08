@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 import xml.etree.ElementTree as ET
 
+from story_policy import anonymise, publication_text, publication_findings, confirmation_problem
 ROOT=Path(__file__).parent
 DATA=ROOT/'data'
 for line in (ROOT/'.env').read_text(encoding='utf-8').splitlines() if (ROOT/'.env').exists() else []:
@@ -76,7 +77,7 @@ def normalise_category(value):
 def story_roles(f):
     roles={normalise_category(r) for r in f.get('story_roles',[]) if isinstance(r,str)} if isinstance(f.get('story_roles',[]),list) else set()
     roles.add(normalise_category(f.get('category')))
-    if f.get('metric_role')=='result': roles.add('outcome')
+    if f.get('category')=='metric' and f.get('metric_role')=='result': roles.add('outcome')
     elif f.get('category')=='metric' and f.get('metric_role','unknown')=='unknown':
         text=f.get('wording','').casefold()
         if re.search(r'\b(fell|rose|reduced|decreased|increased|saved|improved|achieved)\b',text) and not re.search(r'\b(target|expected|projected|planned|potential|forecast)\b',text): roles.add('outcome')
@@ -149,7 +150,9 @@ def draft(p,fmt,section_index=None):
                "Challenge should develop the previous process and its constraints in 2–3 paragraphs; Solution is the longest section, explaining the user workflow in 3–4 paragraphs; Outcome explains results and their supported operational meaning. "
                if fmt=='Case Study' else "Write a concise executive One-Pager, normally 220–320 words when evidence supports it. Keep the provisional sections and use developed, economical paragraphs rather than a shortened copy of every case-study paragraph. ")
         evidence=[{k:f[k] for k in ['fact_id','category','story_roles','metric_role','wording','value','unit','period','qualifier','comparison'] if f.get(k)} for f in fs]
-        prompt=('You are a senior B2B case-study writer. Return JSON {sections:[{name,text,fact_ids}]}. '+brief+
+        evidence=json.loads(anonymise(json.dumps(evidence),p))
+        safe_plan=json.loads(anonymise(json.dumps(p['plan']),p))
+        prompt=('PUBLICATION RULES: Client identity is confidential. Use the client or a source-supported industry description, never the client name. The client is the beneficiary; our delivery team implemented the solution. Attribute Product Genius and BPA 4.0 to the delivery team; do not say the client built or delivered them. Solution is the intervention; Outcome is the supported change for the client. Preserve estimates, capacity equivalents and projections as such, never convert them into realised savings. Do not invent seconds, instant completion, elimination of SME consultation, or causal revenue outcomes. You are a senior B2B case-study writer. Return JSON {sections:[{name,text,fact_ids}]}. '+brief+
           'Audience: business decision-makers evaluating the same operational problem; choose concrete relevance over generic selling. Do not invent an ICP, role, sector, scale or benefit absent from the facts. '
           'Use simple, crisp, direct, business-oriented language and natural medium-length sentences, not choppy sentence fragments. Build connected paragraphs; no repetition or filler. '
           'Title: a compelling NONNUMERIC outcome-led headline, usually How…, not a copied fact sentence. Do not put metric values in the headline. Do not put fact IDs, citations or editorial notes inside the reader-facing text; IDs go in fact_ids only. Subtext: intervention and supported change, not a repeat of Context. Context establishes the client and scope. '
@@ -159,10 +162,10 @@ def draft(p,fmt,section_index=None):
           'Business relevance must be explicitly evidenced, not inferred selling language: never claim freed staff for higher-value work, improved customer experience, scalability or strategic capacity unless the facts say so. Why It Matters should explain the evidenced operational change without repeating numeric metrics; leave figures in Impact or Key Results. No invented transitions that imply unsupported causality. Omit unsupported benefits, quotes or product claims. Do not pad thin evidence. CTA must be [Approved CTA pending]. '
           'Evidence gaps do not stop drafting. If a section lacks confirmed supporting evidence, return [Evidence pending: section name] with empty fact_ids for that section instead of inventing content. A missing category label alone does not mean a fact is unusable; understand its semantic story_roles. Return exactly these sections in order: '+json.dumps(targets)+
           '. Develop the complete operational details in the evidence; do not merely paste a list of extracted statements. Each section has a distinct purpose and must not repeat others. Current confirmed permitted evidence ONLY: '+json.dumps(evidence)+
-          '. Approved output-neutral plan: '+json.dumps(p['plan'])+
+          '. Approved output-neutral plan: '+json.dumps(safe_plan)+
           '. Applied extracted editorial guide: '+PROFILE+
           '. Approved active style references for this format ONLY (no factual authority): '+json.dumps(refs))
-        prompt+=' FINAL DRAFTING CONTRACT: Use a descriptive, nonnumeric Title/Headline about the operational change, never a percentage, fraction or multiplier headline. Headline pattern: How [permitted organisation or type] [concrete supported workflow improvement]. Populate fact_ids even for the headline and subtext. Preserve complete numeric details in results sections.'
+        prompt+=' FINAL DRAFTING CONTRACT: Use a descriptive, nonnumeric Title/Headline about the operational change, never a percentage, fraction or multiplier headline. Headline pattern: How [confirmed solution name] helped [anonymous client type] [concrete supported workflow improvement]. Keep the intervention central; never lead with a client name. Populate fact_ids even for the headline and subtext. Preserve complete numeric details in results sections.'
         if section_index is not None: prompt+=' Rewrite only the requested section, with different wording and better flow. Match this existing draft and avoid repeating it: '+json.dumps(existing)+'. RETURN EXACTLY ONE SECTION named '+targets[0]+'. Return JSON {sections:[{name,text,fact_ids}]}; do not return other sections.'
         started=time.monotonic()
         result=ai(prompt);sections=result if isinstance(result,list) else result.get('sections',[]) if isinstance(result,dict) else [];engine='AI-written fictional sample' if p['demo'] else 'AI-written intake draft'
@@ -172,6 +175,7 @@ def draft(p,fmt,section_index=None):
         allowed={f['fact_id'] for f in fs}
         for x in sections:
             if not isinstance(x.get('text'),str) or not x['text'].strip() or not isinstance(x.get('fact_ids'),list) or not set(x['fact_ids']).issubset(allowed): raise ValueError('The model returned invalid evidence links. Retry drafting.')
+            x['text']=publication_text(x['text'],p)
             x['text']=re.sub(r'\s*\(?F\d+\)?(?=[.,;:!?\s]|$)','',x['text'])
             if x['name']=='CTA': x.update(text='[Approved CTA pending]',fact_ids=[])
         # A single targeted repair catches schema-compliant but unusable first drafts.
@@ -201,11 +205,13 @@ def draft(p,fmt,section_index=None):
                 if not isinstance(repaired,list) or not all(isinstance(x,dict) for x in repaired) or [x.get('name') for x in repaired]!=targets: raise ValueError('The writing model could not complete the required sections. Retry.')
                 for x in repaired:
                     if not isinstance(x.get('text'),str) or not isinstance(x.get('fact_ids'),list) or not set(x['fact_ids']).issubset(allowed): raise ValueError('The revised draft returned invalid evidence links. Retry.')
+                    x['text']=publication_text(x['text'],p)
                     x['text']=re.sub(r'\s*\(?F\d+\)?(?=[.,;:!?\s]|$)','',x['text'])
                     if x['name']=='CTA': x.update(text='[Approved CTA pending]',fact_ids=[])
                 sections=repaired
             except (ValueError,TimeoutError):
                 generation_note='The first draft is retained. An additional writing refinement could not complete; review the content and run draft checks before approval.'
+    for section in sections: section['text']=publication_text(section['text'],p)
     return dict(sections=sections,revision=1,validation=None,review='Pending human review',reference_ids=[r['id'] for r in refs],engine=engine,generation_note=generation_note)
 
 def normalise_detail(text):
@@ -226,6 +232,9 @@ def validate(p,fmt,d):
     restricted=[f.get('restriction') or f['wording'] for f in p['facts'] if f['status']=='restricted' or f.get('restriction')]
     for s in d['sections']:
         t=s['text']
+        for check,term,reason in publication_findings(t,p):issue('block',check,s['name'],term,reason)
+        for phrase in ['completes in seconds','eliminating the need','eliminated the need']:
+            if phrase in t.casefold() and not any(phrase in allowed[fid]['wording'].casefold() for fid in s.get('fact_ids',[]) if fid in allowed):issue('block','Claims',s['name'],phrase,'This speed or elimination claim is not supported by linked evidence.')
         if t.startswith('[Evidence pending:'): issue('block','Evidence gaps',s['name'],t,'This section is a placeholder, not a supported factual claim. Add evidence before final approval.')
         elif s['name']!='CTA' and t!='No confirmed measurable result.' and not s.get('fact_ids'):
             issue('block','Claims',s['name'],t,'Factual section has no claim-to-source links. Regenerate this section or link its confirmed evidence.')
@@ -357,9 +366,18 @@ def process(action,b):
     elif action=='retryExtraction':
         if not p.get('document'): raise ValueError('Upload the intake again to retry extraction.')
         return process('upload',{'name':p['file'],'read_document':p['document']})
+    elif action=='confirmFacts':
+        requested=[f for f in p['facts'] if f['fact_id'] in b.get('confirm_ids',[])]
+        problems=[confirmation_problem(f) for f in requested]
+        if any(problems):raise ValueError(next(problem for problem in problems if problem))
+        for f in requested:
+            f['status']='confirmed';f['confirmation']={'by':b.get('writer','Writer'),'at':now(),'wording':f['wording'],'method':'individual_confirmation'}
+        p['plan_approved']=False
+        for d in p['drafts'].values():d['validation']=None;d['review']='Pending human review'
     elif action=='verify':
         for fid in b.get('confirm_ids',[]):
             f=next((f for f in p['facts'] if f['fact_id']==fid),None)
+            if f and confirmation_problem(f):raise ValueError(confirmation_problem(f))
             if not f or f.get('restriction') or f['status'] in ['restricted','missing']: raise ValueError('Only permitted source facts can be confirmed.')
             if f['category']=='metric' and not all(f.get(k) for k in ['value','unit','period']): raise ValueError('Review the incomplete metric before confirmation.')
             if not f.get('passage'): raise ValueError('Review the fact without source evidence before confirmation.')

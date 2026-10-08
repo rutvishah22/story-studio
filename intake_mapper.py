@@ -79,14 +79,21 @@ def map_intake(document):
             after=wording.split('After:',1)[-1]
             primary=re.search(r'(\$)?([\d,]+(?:\.\d+)?)\s*(%|Ã—|hours?|hrs?|minutes?|mins?|FTEs?|users?|cycles?)?',after,re.I)
             if primary:value=primary[2];unit='$' if primary[1] else primary[3] or ''
+            if not unit and re.search(r'rework cycles?',after,re.I):unit='rework cycles'
+            if not unit and re.search(r'tasks/day',after,re.I):unit='users'
             timeframe=re.search(r'(?:per |/)(week|month|year|day)|\b(annual|monthly|weekly|daily)\b',wording,re.I)
             if timeframe:period=timeframe[0]
+            elif unit=='×':period='not applicable'
             qualifier='estimated' if re.search(r'estimat',wording,re.I) else 'approximately' if re.search(r'approxim|~',wording) else ''
             comparison=wording.split('After:')[0].replace('Before:','').strip() if 'After:' in wording else ''
-            if len(matches)>1:review.append('Multiple figures or a before/after calculation: confirm the complete result and measurement basis.')
+            # Several values in a before/after result are normal, not an ambiguity.
+            conflict=re.search(r'([\d,]+)\s+search hours/month.*?\(([\d,]+)\s*[×x]\s*([\d,]+)\s*hrs/week\s*[×x]\s*([\d,]+)\s*weeks',wording,re.I)
+            if conflict:
+                stated,users,hours,weeks=[int(v.replace(',','')) for v in conflict.groups()]
+                if stated!=users*hours*weeks:review.append(f'Conflicting calculation: {users} × {hours} × {weeks} = {users*hours*weeks}, not {stated}.')
             if not period:review.append('Measurement period is not stated in this answer.')
             if not unit:review.append('Metric unit needs confirmation.')
             if re.search(r'target|potential|projected|estimated|assuming|equivalent|capacity',wording,re.I):review.append('Confirm whether this is measured, estimated or projected; capacity is not automatically realised savings.')
         if a['group'] in ['before_state','solution'] and re.search(r'\b(target|projected|assuming|potential savings)\b',wording,re.I):review.append('This answer includes a target or calculated estimate. Confirm its publication basis before using the whole claim.')
-        facts.append({'category':cat,'wording':wording,'passage':a['source'],'location':'; '.join(dict.fromkeys(a['locations'])),'intake_group':a['group'],'field':a['field'],'value':value,'unit':unit,'period':period,'qualifier':qualifier,'comparison':comparison,'needs_review':bool(review),'review_reason':' '.join(review),'metric_role':'unknown' if review else 'result','story_roles':[category[a['group']]] if cat!='metric' else ['outcome'],'restriction':wording if cat=='restricted' else ''})
+        facts.append({'calculation_conflict':any(reason.startswith('Conflicting calculation:') for reason in review),'category':cat,'wording':wording,'passage':a['source'],'location':'; '.join(dict.fromkeys(a['locations'])),'intake_group':a['group'],'field':a['field'],'value':value,'unit':unit,'period':period,'qualifier':qualifier,'comparison':comparison,'needs_review':bool(review),'review_reason':' '.join(review),'metric_role':('unknown' if review else 'result') if cat=='metric' else 'not_applicable','story_roles':[category[a['group']]] if cat!='metric' else ['outcome'],'restriction':wording if cat=='restricted' else ''})
     return {'facts':facts,'answers':answers,'unmapped_fields':unmapped,'engine':'Local section-and-answer mapping'}
