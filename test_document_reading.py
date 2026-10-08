@@ -29,12 +29,12 @@ class Reading(unittest.TestCase):
         self.assertEqual(rows[1]['cells'],['Solution','Shared queue assigns analyst review.'])
     def test_failure_does_not_accept_fragments_and_retry_recovers(self):
         data,rows=word();body={'name':'fictional.docx','data':base64.b64encode(data).decode()}
-        with patch.dict(s.os.environ,{'OPENAI_API_KEY':'test'}),patch.object(s,'ai',return_value={'facts':[{'category':'context','wording':'Employee','passage':'Client context'}]}):p=s.process('upload',body)['project']
-        self.assertEqual(p['facts'],[]);self.assertEqual(p['extraction_status'],'failed')
+        with patch.dict(s.os.environ,{'OPENAI_API_KEY':'test'}),patch.object(s,'ai',side_effect=AssertionError('Structured intake must not call AI')):p=s.process('upload',body)['project']
+        self.assertEqual(len(p['facts']),4);self.assertEqual(p['extraction_status'],'complete')
         self.assertNotIn('upload_data',p)
         facts=[{'category':cat,'wording':row[1],'passage':row[1],'intake_group':group,'field':row[0]} for cat,group,row in zip(['context','challenge','solution'],['client_context','before_state','solution'],rows)]
         with patch.dict(s.os.environ,{'OPENAI_API_KEY':'test'}),patch.object(s,'ai',return_value={'facts':facts}):p=s.process('retryExtraction',{'project':p})['project']
-        self.assertEqual(len(p['facts']),3);self.assertEqual(len(p['intake']['solution']),1)
+        self.assertEqual(len(p['facts']),4);self.assertEqual(len(p['intake']['solution']),1)
         self.assertNotIn('50%',str(p['facts']))
         p=s.process('verify',{'project':p,'confirm_ids':s.review_summary(p)['quick_confirm_ids']})['project'];p=s.process('plan',{'project':p})['project']
         for fmt in s.SECTIONS:
@@ -45,6 +45,6 @@ class Reading(unittest.TestCase):
     def test_no_key_retains_document_without_pseudo_facts(self):
         data,_=word()
         with patch.dict(s.os.environ,{'OPENAI_API_KEY':''}):p=s.process('upload',{'name':'fictional.docx','data':base64.b64encode(data).decode()})['project']
-        self.assertEqual(p['facts'],[]);self.assertEqual(p['extraction_status'],'unavailable');self.assertTrue(p['raw'])
+        self.assertEqual(len(p['facts']),4);self.assertEqual(p['extraction_status'],'complete');self.assertTrue(p['raw'])
 
 if __name__=='__main__':unittest.main()

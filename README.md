@@ -49,3 +49,9 @@ PDFs use pdfplumber to preserve table rows, cells and reading order; Word files 
 This uses free open-source libraries and the configured inference provider. No Docling service or paid OCR is required. Scanned/image-only PDFs are explicitly rejected because OCR is not implemented. Groq free-tier quotas and latency still apply. The original file is processed temporarily; only structured text and session state are returned, avoiding a base64 file in every later request. Retry uses the already-read document.
 
 Run the regression tests with `python -m unittest test_document_reading test_transparent_review test_session test_resilience test_writing -v`. Real provider writing quality must also be assessed using a completed, permitted intake; mocked tests cannot establish that quality.
+
+
+### AI-independent structured forms
+Recognisable questions and section headings are mapped locally before any model call. The mapper retains completed table cells, joins answer continuations across pages, keeps original passages/locations, and excludes template hints and empty answers. Each of the six intake groups has named fields. AI extraction remains a clearly labelled recovery path for unstructured documents only; normal structured upload and Retry consume no inference quota. Drafting and semantic validation still require the configured model. Targets, multi-value results and missing measurement periods are flagged rather than silently treated as verified results.
+
+Run `python -m unittest test_intake_mapping test_document_reading test_transparent_review test_session test_resilience test_writing -v`. Optional real-intake regression uses environment variable REAL_INTAKE_TEST pointing to a permitted local file; client material is not bundled, seeded into demo data, or sent to a provider by this regression. Model drafting is mocked in automated regression, so live prose quality remains a separate assessment.
